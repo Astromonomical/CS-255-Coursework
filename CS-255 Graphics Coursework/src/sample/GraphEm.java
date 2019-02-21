@@ -6,8 +6,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-
-import javax.imageio.ImageReader;
 import java.util.ArrayList;
 
 public class GraphEm {
@@ -32,6 +30,10 @@ public class GraphEm {
 		drawGraph();
 	}
 
+	/**
+	 * Adds a coordinate to the graph
+	 * @param coords New coordinate
+	 */
 	public void addPoint(Coordinate coords) {
 		if (points.size() != 0) {
 			if (coords.getX() > points.get(points.size() - 1).getX()) {
@@ -47,6 +49,10 @@ public class GraphEm {
 		}
 	}
 
+	/**
+	 * Removes a coordinate from the graph
+	 * @param coords Coords to remove
+	 */
 	public void removePoint(Coordinate coords) {
 		Coordinate toDelete = null;
 
@@ -64,6 +70,11 @@ public class GraphEm {
 
 	}
 
+	/**
+	 * Update the contrast of an image input by the current state of the graph
+	 * @param image Image to contrast stretch
+	 * @return Contrast stretched image
+	 */
 	public Image updateContrast(Image image) {
 		int height = (int) image.getHeight();
 		int width = (int) image.getWidth();
@@ -75,17 +86,15 @@ public class GraphEm {
 		PixelWriter contrastWriter = contrastStret.getPixelWriter();
 		PixelReader imageReader = image.getPixelReader();
 
-		fillTable();
-
 		for (int y = 0 ; y < height ; y++) {
 			for (int x = 0 ; x < width ; x++) {
 				// Read pixel from the image
 				Color colour = imageReader.getColor(x, y);
 
 				// Get gamma corrected values from table
-				double red = lookupTable[(int) (colour.getRed() * 255)];
-				double green = lookupTable[(int) (colour.getGreen() * 255)];
-				double blue = lookupTable[(int) (colour.getBlue() * 255)];
+				double red = getValue(colour.getRed() * 255);
+				double green = getValue(colour.getGreen() * 255);
+				double blue = getValue( colour.getBlue() * 255);
 
 				// Create new pixel and change pixel
 				colour = Color.color(red / 255.0, green / 255.0, blue / 255.0);
@@ -96,6 +105,9 @@ public class GraphEm {
 		return contrastStret;
 	}
 
+	/**
+	 * Read through all point coordinates and draw points on graph
+	 */
 	private void drawGraph() {
 		int prevX = 0;
 		int prevY = 0;
@@ -114,29 +126,40 @@ public class GraphEm {
 		canvas.getGraphicsContext2D().strokeLine(prevX, prevY, 255, 255);
 	}
 
-	private void fillTable() {
-		double prevX = 0;
-		double prevY = 0;
-		double result;
+	/**
+	 * Get stretched value from graph
+	 * @param input Original value
+	 * @return Stretched value
+	 */
+	private double getValue(double input) {
+		int xOne = 0;
+		int yOne = 0;
 
-		for (Coordinate a : points) {
-			double gradient = ((a.getY() - prevY) / (a.getX() - prevX));
+		int xTwo = 255;
+		int yTwo = 255;
 
-			for (int i = (int) prevX ; i < a.getX() ; i++) {
-				// Equation
-				result = gradient * (i - a.getX()) + a.getY();
-				lookupTable[i] = (int) result;
+		boolean found = false;
+
+		for(Coordinate a : points) {
+
+			// Once i is less than a.getX() it must be between the last
+			// coordinate and this one
+			if (input < a.getX()) {
+				xTwo = a.getX();
+				yTwo = a.getY();
+				found = true;
+			} else {
+				xOne = a.getX();
+				yOne = a.getY();
 			}
-
-			prevX = a.getX();
-			prevY = a.getY();
-
 		}
 
-		// Calculate for final coord
-		for (int i = (int) prevX ; i <= 255 ; i++) {
-			result = ((255 - prevY) / (255 - prevX)) * (i - prevX) + prevY;
-		}
+		// Calculate the gradient
+		double gradient = (yTwo - yOne) / (xTwo - xOne);
 
+		// Calculate new value
+		double result = gradient * (input - xTwo) + yTwo;
+
+		return result;
 	}
 }
