@@ -16,4 +16,12 @@ public class Coordinate {
 	public int getY() {
 		return this.y;
 	}
+
+	public int getDrawX() {
+		return this.y;
+	}
+
+	public int getDrawY() {
+		return this.x;
+	}
 }

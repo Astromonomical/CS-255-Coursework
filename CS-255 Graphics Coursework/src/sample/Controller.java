@@ -2,6 +2,8 @@ package sample;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,8 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -61,7 +65,19 @@ public class Controller {
 		});
 
 		graph = new GraphEm(contGraph);
-		graph.updateContrast(imagePort.getImage());
+		imagePort.setImage(graph.updateContrast(imagePort.getImage()));
+
+		contGraph.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				graph.movePoint(new Coordinate((int) event.getX(),
+					(int) event.getY()));
+
+				imagePort.setImage(graph.updateContrast(imagePort.getImage()));
+			}
+
+		});
 	}
 
 	public void handleReset() throws FileNotFoundException {
@@ -79,20 +95,5 @@ public class Controller {
 		Image invIm = GammaCorrect.ImageInverter(imagePort.getImage());
 		originalImage = invIm;
 		imagePort.setImage(invIm);
-	}
-
-	public void handleAddPoint(MouseEvent mouseEvent) {
-		// Coordinates are invereted as the canvas has been rotated
-		int xCoord = (int) mouseEvent.getY();
-		int yCoord = (int) mouseEvent.getX();
-
-		if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-			graph.addPoint(new Coordinate(xCoord, yCoord));
-		} else {
-			graph.removePoint(new Coordinate(xCoord, yCoord));
-		}
-
-		Image newImg = graph.updateContrast(originalImage);
-		imagePort.setImage(newImg);
 	}
 }

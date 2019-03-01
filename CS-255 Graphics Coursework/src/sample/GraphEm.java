@@ -15,10 +15,8 @@ public class GraphEm {
 	 */
 	private ArrayList<Coordinate> points = new ArrayList<>();
 
-	/**
-	 * Lookup table for the contrast stretched values
-	 */
-	private static int[] lookupTable = new int[256];
+	Coordinate point1 = new Coordinate(100, 50);
+	Coordinate point2 = new Coordinate(200, 200);
 
 	/**
 	 * Canvas to draw on
@@ -34,40 +32,24 @@ public class GraphEm {
 	 * Adds a coordinate to the graph
 	 * @param coords New coordinate
 	 */
-	public void addPoint(Coordinate coords) {
-		if (points.size() != 0) {
-			if (coords.getX() > points.get(points.size() - 1).getX()) {
-				points.add(coords);
+	public void movePoint(Coordinate coords) {
+		if (coords.getX() > point1.getX() - 10 && coords.getX() < point1.getX() + 10) {
+			// If X coordinates match for point 1
+			if (coords.getY() > point1.getY() - 10 && coords.getY() < point1.getY() + 10) {
+				// If Y coordinates match for point 1
+				point1 = coords;
 				drawGraph();
-			} else {
-				System.out.println("Error");
-			}
-		} else {
-			points.add(coords);
-			drawGraph();
-
-		}
-	}
-
-	/**
-	 * Removes a coordinate from the graph
-	 * @param coords Coords to remove
-	 */
-	public void removePoint(Coordinate coords) {
-		Coordinate toDelete = null;
-
-		for (Coordinate a : points) {
-			if (a.getX() > coords.getX() - 10 && a.getX() < coords.getX() + 10) {
-				if (a.getY() > coords.getY() - 10 && a.getY() < coords.getY() + 10) {
-					toDelete = a;
-					drawGraph();
-				}
 			}
 		}
 
-		points.remove(toDelete);
-		drawGraph();
-
+		if (coords.getX() > point2.getX() - 10 && coords.getX() < point2.getX() + 10) {
+			// If X coordinates match for point 2
+			if (coords.getY() > point2.getY() - 10 && coords.getY() < point2.getY() + 10) {
+				// If Y coordinates match for point 2
+				point2 = coords;
+				drawGraph();
+			}
+		}
 	}
 
 	/**
@@ -92,9 +74,9 @@ public class GraphEm {
 				Color colour = imageReader.getColor(x, y);
 
 				// Get gamma corrected values from table
-				double red = getValue(colour.getRed() * 255);
-				double green = getValue(colour.getGreen() * 255);
-				double blue = getValue( colour.getBlue() * 255);
+				double red = getValue(colour.getRed() * 255.0);
+				double green = getValue(colour.getGreen() * 255.0);
+				double blue = getValue( colour.getBlue() * 255.0);
 
 				// Create new pixel and change pixel
 				colour = Color.color(red / 255.0, green / 255.0, blue / 255.0);
@@ -113,17 +95,31 @@ public class GraphEm {
 		int prevY = 0;
 
 		canvas.getGraphicsContext2D().clearRect(0, 0, 255, 255);
-		// Draw the lines
-		for (Coordinate a : points) {
-			canvas.getGraphicsContext2D().strokeRect(a.getY() - 3, a.getX() - 3
-				, 6,	6);
-			canvas.getGraphicsContext2D().strokeLine(prevX, prevY, a.getY(),
-				a.getX());
-			prevX = a.getY();
-			prevY = a.getX();
-		}
 
-		canvas.getGraphicsContext2D().strokeLine(prevX, prevY, 255, 255);
+		// Draw the lines
+		canvas.getGraphicsContext2D().strokeLine(0, 0,
+			point1.getX(),
+			point1.getY());
+		canvas.getGraphicsContext2D().strokeLine(point1.getX(),
+			point1.getY(),
+			point2.getX(),
+			point2.getY());
+
+		// Draw squares at each point
+		canvas.getGraphicsContext2D().strokeRect(point1.getX() - 3,
+			point1.getY() - 3
+			, 6,	6);
+
+		canvas.getGraphicsContext2D().strokeRect(point2.getX() - 3,
+			point2.getY() - 3
+			, 6,	6);
+
+		// Draw final line from point 2 to the end
+		canvas.getGraphicsContext2D().strokeLine(point2.getX(),
+			point2.getY(),
+			255,	255);
+
+
 	}
 
 	/**
@@ -132,26 +128,36 @@ public class GraphEm {
 	 * @return Stretched value
 	 */
 	private double getValue(double input) {
-		int xOne = 0;
-		int yOne = 0;
+		double xOne;
+		double yOne;
+		double xTwo;
+		double yTwo;
 
-		int xTwo = 255;
-		int yTwo = 255;
 
-		boolean found = false;
+		// Work out where the input is and set variables appropriately
+		if (input > point1.getX()) {
+			if (input > point2.getX()) {
+				// After point 2
+				xOne = point2.getX();
+				yOne = point2.getY();
+				xTwo = 255.0;
+				yTwo = 255.0;
 
-		for(Coordinate a : points) {
-
-			// Once i is less than a.getX() it must be between the last
-			// coordinate and this one
-			if (input < a.getX()) {
-				xTwo = a.getX();
-				yTwo = a.getY();
-				found = true;
 			} else {
-				xOne = a.getX();
-				yOne = a.getY();
+				// Inbetween the points
+				xOne = point1.getX();
+				yOne = point1.getY();
+				xTwo = point2.getX();
+				yTwo = point2.getY();
+
 			}
+		} else {
+			// Before point 1
+			xOne = 0.0;
+			yOne = 0.0;
+			xTwo = point1.getX();
+			yTwo = point1.getY();
+
 		}
 
 		// Calculate the gradient
