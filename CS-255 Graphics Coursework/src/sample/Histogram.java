@@ -8,6 +8,9 @@ import javafx.scene.paint.Color;
 
 /**
  * Contains methods for histogram and value charts as well as equalisation
+ * @author: Scott Simmons (960689)
+ * I, Scott Simmons hereby declare that all code provided in this file was
+ * solely written and produced by myself.
  */
 public class Histogram {
 	private static double[] mapping = new double[256];

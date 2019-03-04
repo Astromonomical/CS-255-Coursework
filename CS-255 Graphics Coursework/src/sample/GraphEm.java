@@ -11,6 +11,9 @@ import java.util.ArrayList;
 /**
  * Contains the methods for handling graph interactions as well as methods
  * for contrast stretching. Short for Graph Emulator.
+ * @author: Scott Simmons (960689)
+ * I, Scott Simmons hereby declare that all code provided in this file was
+ * solely written and produced by myself.
  */
 public class GraphEm {
 	/**

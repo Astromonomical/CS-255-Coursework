@@ -2,6 +2,9 @@ package sample;
 
 /**
  * Models a (x,y) coordinate
+ * @author: Scott Simmons (960689)
+ * I, Scott Simmons hereby declare that all code provided in this file was
+ * solely written and produced by myself.
  */
 public class Coordinate {
 	private int x;

@@ -6,6 +6,12 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
+/**
+ * @author: Scott Simmons (960689)
+ * The code for the inversion of images was provided to me at the beginning of
+ * the assignemnt by the lecturer and is not examined as part of this
+ * assignment.
+ */
 public class Invert {
 
 	public static Image invert(Image image) {

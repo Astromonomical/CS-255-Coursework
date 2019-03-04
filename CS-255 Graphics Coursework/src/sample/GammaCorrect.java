@@ -8,6 +8,9 @@ import javafx.scene.paint.Color;
 
 /**
  * This class handles all the gamma correction methods
+ * @author: Scott Simmons (960689)
+ * I, Scott Simmons hereby declare that all code provided in this file was
+ * solely written and produced by myself.
  */
 public class GammaCorrect {
 

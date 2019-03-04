@@ -22,6 +22,9 @@ import java.io.FileNotFoundException;
 
 /**
  * Controller class for updating and handling interface events in javaFX
+ * @author: Scott Simmons (960689)
+ * I, Scott Simmons hereby declare that all code provided in this file was
+ * solely written and produced by myself.
  */
 public class Controller {
 	// The original image, no edits
