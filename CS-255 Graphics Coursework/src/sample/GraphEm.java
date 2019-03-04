@@ -8,6 +8,10 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
 
+/**
+ * Contains the methods for handling graph interactions as well as methods
+ * for contrast stretching. Short for Graph Emulator.
+ */
 public class GraphEm {
 	/**
 	 * This arraylist contains all points the user has made
@@ -15,7 +19,7 @@ public class GraphEm {
 	 */
 	private ArrayList<Coordinate> points = new ArrayList<>();
 
-	Coordinate point1 = new Coordinate(100, 50);
+	Coordinate point1 = new Coordinate(50, 50);
 	Coordinate point2 = new Coordinate(200, 200);
 
 	/**
@@ -23,22 +27,30 @@ public class GraphEm {
 	 */
 	private Canvas canvas;
 
+	/**
+	 * Canvas to turn into a graph (MUST BE 255 / 255 in size)
+	 * @param canvas
+	 */
 	public GraphEm(Canvas canvas) {
 		this.canvas = canvas;
 		drawGraph();
 	}
 
 	/**
-	 * Adds a coordinate to the graph
-	 * @param coords New coordinate
+	 * Moves one of the two points on the graph
+	 * @param coords New updated coordinates
 	 */
-	public void movePoint(Coordinate coords) {
+	public boolean movePoint(Coordinate coords) {
 		if (coords.getX() > point1.getX() - 10 && coords.getX() < point1.getX() + 10) {
 			// If X coordinates match for point 1
 			if (coords.getY() > point1.getY() - 10 && coords.getY() < point1.getY() + 10) {
 				// If Y coordinates match for point 1
-				point1 = coords;
-				drawGraph();
+				if (coords.getX() < point2.getX()) {
+					// Point 1 cannot be placed right of point 2
+					point1 = coords;
+					drawGraph();
+					return true;
+				}
 			}
 		}
 
@@ -46,10 +58,16 @@ public class GraphEm {
 			// If X coordinates match for point 2
 			if (coords.getY() > point2.getY() - 10 && coords.getY() < point2.getY() + 10) {
 				// If Y coordinates match for point 2
-				point2 = coords;
-				drawGraph();
+				if (coords.getX() > point1.getX()) {
+					// Point 2 cannot be behind point 1
+					point2 = coords;
+					drawGraph();
+					return true;
+				}
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -78,6 +96,19 @@ public class GraphEm {
 				double green = getValue(colour.getGreen() * 255.0);
 				double blue = getValue( colour.getBlue() * 255.0);
 
+				// If statements to prevent error where values would go below 0
+				if (red < 0) {
+					red = 0;
+				}
+
+				if (green < 0) {
+					green = 0;
+				}
+
+				if (blue < 0) {
+					blue = 0;
+				}
+
 				// Create new pixel and change pixel
 				colour = Color.color(red / 255.0, green / 255.0, blue / 255.0);
 				contrastWriter.setColor(x, y, colour);
@@ -98,25 +129,25 @@ public class GraphEm {
 
 		// Draw the lines
 		canvas.getGraphicsContext2D().strokeLine(0, 0,
-			point1.getX(),
-			point1.getY());
-		canvas.getGraphicsContext2D().strokeLine(point1.getX(),
-			point1.getY(),
-			point2.getX(),
-			point2.getY());
+			point1.drawX(),
+			point1.drawY());
+		canvas.getGraphicsContext2D().strokeLine(point1.drawX(),
+			point1.drawY(),
+			point2.drawX(),
+			point2.drawY());
 
 		// Draw squares at each point
-		canvas.getGraphicsContext2D().strokeRect(point1.getX() - 3,
-			point1.getY() - 3
+		canvas.getGraphicsContext2D().strokeRect(point1.drawX() - 3,
+			point1.drawY() - 3
 			, 6,	6);
 
-		canvas.getGraphicsContext2D().strokeRect(point2.getX() - 3,
-			point2.getY() - 3
+		canvas.getGraphicsContext2D().strokeRect(point2.drawX() - 3,
+			point2.drawY() - 3
 			, 6,	6);
 
 		// Draw final line from point 2 to the end
-		canvas.getGraphicsContext2D().strokeLine(point2.getX(),
-			point2.getY(),
+		canvas.getGraphicsContext2D().strokeLine(point2.drawX(),
+			point2.drawY(),
 			255,	255);
 
 

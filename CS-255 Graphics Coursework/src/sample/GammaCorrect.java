@@ -6,6 +6,9 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
+/**
+ * This class handles all the gamma correction methods
+ */
 public class GammaCorrect {
 
 	/**
@@ -75,6 +78,11 @@ public class GammaCorrect {
 		return inverted_image;
 	}
 
+	/**
+	 * Populates the lookup table (index) with values
+	 * @param gamma The gamma value from the slider
+	 * @return The lookup table
+	 */
 	private static double[] populateIndex(double gamma) {
 		final int POSSIBLE_VALS = 256;
 		double[] vTable = new double[POSSIBLE_VALS];
